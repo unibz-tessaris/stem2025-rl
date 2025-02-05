@@ -7,7 +7,7 @@ platforms = ["win-64", "linux-64", "osx-64", "osx-arm64"]
 version = "0.1.0"
 
 [tasks]
-lab = { cmd = ["jupyter", "lab"], depends-on = ["configure"] }
+lab = { cmd = ["jupyter", "lab"] }
 
 [dependencies]
 gymnasium-box2d = ">=1.0.0,<2"
