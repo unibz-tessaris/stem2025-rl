@@ -3,7 +3,11 @@ set repo=https://github.com/unibz-tessaris/stem2025-rl.git
 FOR /F "tokens=* USEBACKQ" %%F IN (`powershell -C "[Environment]::GetFolderPath([Environment+SpecialFolder]::Desktop)"`) DO (
   SET desk=%%F
 )
-set dest=%desk%\stem2025-rl
+FOR /F "tokens=* USEBACKQ" %%F IN (`powershell -C "[Environment]::GetFolderPath([Environment+SpecialFolder]::MyDocuments)"`) DO (
+  SET docs=%%F
+)
+
+set dest=%docs%\stem2025-rl
 
 ECHO %repo%
 ECHO %dest%
