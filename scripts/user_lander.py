@@ -33,52 +33,59 @@ def run_game(env: gym.Env,
 
     clock = pygame.time.Clock()
 
-    total: float = 0
-    landed = False
-    done = False
-    # play at most for two minutes
-    for i in range(fps * 120):
-        if done or not game.running:
-            break
-        if autopilot:
-            action = lunar_lander.heuristic(env=env, s=obs)
+    while game.running:
+        print('Starting episode')
+        obs, info = env.reset(seed=seed)
+        total: float = 0
+        landed = False
+        done = False
+        # play at most for two minutes
+        for i in range(fps * 120):
+            if done or not game.running:
+                break
+            if autopilot:
+                action = lunar_lander.heuristic(env=env, s=obs)
+            else:
+                action = controls.get(tuple(sorted(game.pressed_keys)), noop)
+            obs, rew, terminated, truncated, info = env.step(action)
+            done = terminated or truncated
+            total += rew
+            if terminated and rew >= 100:
+                landed = True
+
+            if obs is not None:
+                rendered = env.render()
+                if isinstance(rendered, Sequence):
+                    rendered = rendered[-1]
+                display_arr(
+                    game.screen, rendered, transpose=transpose, video_size=game.video_size
+                )
+
+            for event in pygame.event.get():
+                game.process_event(event)
+
+            pygame.display.flip()
+            clock.tick(fps)
+
+        pygame.freetype.init()
+        font = pygame.freetype.SysFont(pygame.freetype.get_default_font(), size=50)
+        if landed:
+            text = font.render(f'Landed ({int(total)})', fgcolor=pygame.Color('green'))
         else:
-            action = controls.get(tuple(sorted(game.pressed_keys)), noop)
-        obs, rew, terminated, truncated, info = env.step(action)
-        done = terminated or truncated
-        total += rew
-        if terminated and rew >= 100:
-            landed = True
-
-        if obs is not None:
-            rendered = env.render()
-            if isinstance(rendered, Sequence):
-                rendered = rendered[-1]
-            display_arr(
-                game.screen, rendered, transpose=transpose, video_size=game.video_size
-            )
-
-        for event in pygame.event.get():
-            game.process_event(event)
-
+            text = font.render(f'Crashed ({int(total)})', fgcolor=pygame.Color('red'))
+        game.screen.blit(text[0], text[1])
         pygame.display.flip()
-        clock.tick(fps)
 
-    pygame.freetype.init()
-    font = pygame.freetype.SysFont(pygame.freetype.get_default_font(), size=50)
-    if landed:
-        text = font.render('Landed', fgcolor=pygame.Color('green'))
-    else:
-        text = font.render('Crashed', fgcolor=pygame.Color('red'))
-    game.screen.blit(text[0], text[1])
-    pygame.display.flip()
+        print("{}, with a total reward of {}".format('Landed' if landed else 'Crashed', total))
 
-    print("{}, with a total reward of {}".format('Landed' if landed else 'Crashed', total))
-
-    while True:
-        event = pygame.event.wait()
-        if event.type == pygame.QUIT:
-            break
+        # wait for a key press
+        print('Wait for keypress')
+        wait_next_game = True
+        while wait_next_game and game.running:
+            for event in pygame.event.get():
+                game.process_event(event)
+                if event.type == pygame.KEYDOWN:
+                    wait_next_game = False
 
     env.close()
     pygame.quit()
