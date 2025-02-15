@@ -34,10 +34,10 @@ class Discretizer:
         for i, s in enumerate(state):
             lb, ub = self.state_bounds[i]
             if i < 6:
-                segment = (ub - lb) * 0.15
+                segment = (ub - lb) * 0.15 # 0.15
                 bins = np.array([0 - segment, 0 - segment / 2, 0, 0 + segment / 2, 0 + segment])
                 if( i == 1 ):  # Y coordinate requires ad-hoc treatment
-                    segment = (ub - lb) * 0.25
+                    segment = (ub - lb) * 0.25 # 0.25
                     bins = np.array([segment/2, segment, segment+segment/2, 2*segment])
                 indices.append(np.digitize(s, bins))
             else:
@@ -65,6 +65,7 @@ def plot_rewards(rewards, ax = None):
     ax.plot(rews, color='grey', alpha=0.3)
     ax.set_xlabel('Episode')
     ax.set_ylabel('Total Reward')
+    ax.setylim([None, 300])
 
     return ax
 
