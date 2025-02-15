@@ -65,7 +65,7 @@ def plot_rewards(rewards, ax = None):
     ax.plot(rews, color='grey', alpha=0.3)
     ax.set_xlabel('Episode')
     ax.set_ylabel('Total Reward')
-    ax.setylim([None, 300])
+    ax.set_ylim(None, 1500)
 
     return ax
 
